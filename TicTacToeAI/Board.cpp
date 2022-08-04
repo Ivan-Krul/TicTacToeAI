@@ -8,7 +8,7 @@ Board::Board(uint8_t size_)
 
 void Board::set(uint16_t pos_, Mark mark_)
 {
-	if(pos_)
+	assert(pos_ < _size);
 	_board[pos_] = mark_;
 }
 
@@ -17,9 +17,10 @@ uint8_t Board::size()
 	return _size;
 }
 
-const Mark* Board::show()
+const Mark Board::show(uint16_t pos_)
 {
-	return _board;
+	assert(pos_ < _size);
+	return _board[pos_];
 }
 
 Board::~Board()

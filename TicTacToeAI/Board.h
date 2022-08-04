@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <cassert>
 enum class Mark : char
 {
 	empty = ' ',
@@ -15,6 +16,6 @@ public:
 	Board(uint8_t size_);
 	void set(uint16_t pos_, Mark mark_);
 	uint8_t size();
-	const Mark* show();
+	const Mark show(uint16_t pos_);
 	~Board();
 };
