@@ -10,6 +10,9 @@ class Game
 	void _checkColons(uint8_t& crosses_,uint8_t& rounds_);
 	void _checkRows(uint8_t& crosses_, uint8_t& rounds_);
 	void _checkDiagonals(uint8_t& crosses_, uint8_t& rounds_);
+	void _checkDiagonals1(uint8_t& crosses_, uint8_t& rounds_);
+	void _checkSingleMark(int8_t x_, int8_t y_, uint8_t& crosses_, uint8_t& rounds_);
+	std::string _outputBorders();
 public:
 	Game(uint8_t sizeBoard_,uint8_t needCheck_);
 	bool isCrossTurn();

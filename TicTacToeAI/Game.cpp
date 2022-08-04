@@ -7,14 +7,7 @@ void Game::_checkColons(uint8_t& crosses_, uint8_t& rounds_)
 	{
 		for(uint8_t ix = 0; ix < _board.size(); ix++)
 		{
-			if(_board.show(ix, iy) == Mark::cross)
-			{
-				crosses_++;
-			}
-			else if(_board.show(ix, iy) == Mark::round)
-			{
-				rounds_++;
-			}
+			_checkSingleMark(ix, iy, crosses_, rounds_);
 		}
 		if(crosses_ == _needCheck || rounds_ == _needCheck)
 			return;
@@ -34,44 +27,111 @@ void Game::_checkRows(uint8_t& crosses_, uint8_t& rounds_)
 	{
 		for(uint8_t iy = 0; iy < _board.size(); iy++)
 		{
-			if(_board.show(ix, iy) == Mark::cross)
-			{
-				crosses_++;
-			}
-			else if(_board.show(ix, iy) == Mark::round)
-			{
-				rounds_++;
-			}
+			_checkSingleMark(ix, iy, crosses_, rounds_);
+		}
 
-			if(crosses_ == _needCheck || rounds_ == _needCheck)
-				return;
-			else
-			{
-				crosses_ = 0;
-				rounds_ = 0;
-			}
+		if(crosses_ == _needCheck || rounds_ == _needCheck)
+			return;
+		else
+		{
+			crosses_ = 0;
+			rounds_ = 0;
 		}
 	}
 }
 
 void Game::_checkDiagonals(uint8_t& crosses_, uint8_t& rounds_)
 {
-	// diagonals
-
-	for(uint8_t ip = 0; ip < _board.size(); ip++)
+	// diagonals, first stage
+	for(int8_t ip = 0; ip < _board.size(); ip++)
 	{
-		for(uint8_t id = 0; id < _board.size(); id++)
+		for(int8_t id = -_board.size()/2+1; id < _board.size(); id++)
 		{
-			if(_board.show(ip+id, ip-id) == Mark::cross)
-			{
-				crosses_++;
-			}
-			else if(_board.show(ip + id, ip - id) == Mark::round)
-			{
-				rounds_++;
-			}
+			_checkSingleMark(ip + id, ip - id,crosses_,rounds_);
+		}
+		if(crosses_ == _needCheck || rounds_ == _needCheck)
+			return;
+		else
+		{
+			crosses_ = 0;
+			rounds_ = 0;
 		}
 	}
+	for(int8_t ip = _board.size() - 1; ip >= 0; ip--)
+	{
+		for(int8_t id = 0; id < _board.size(); id++)
+		{
+			_checkSingleMark(ip + id, ip - id, crosses_, rounds_);
+		}
+		if(crosses_ == _needCheck || rounds_ == _needCheck)
+			return;
+		else
+		{
+			crosses_ = 0;
+			rounds_ = 0;
+		}
+	}
+}
+
+void Game::_checkDiagonals1(uint8_t& crosses_, uint8_t& rounds_)
+{
+	// diagonals, second stage
+	for(int8_t ip = 0; ip < _board.size(); ip++)
+	{
+		for(int8_t id = -_board.size() / 2 + 1; id < _board.size(); id++)
+		{
+			_checkSingleMark(ip + id + 1, ip - id, crosses_, rounds_);
+		}
+		if(crosses_ == _needCheck || rounds_ == _needCheck)
+			return;
+		else
+		{
+			crosses_ = 0;
+			rounds_ = 0;
+		}
+	}
+	for(int8_t ip = _board.size() - 1; ip >= 0; ip--)
+	{
+		for(int8_t id = 0; id < _board.size(); id++)
+		{
+			_checkSingleMark(ip + id + 1, ip - id, crosses_, rounds_);
+		}
+		if(crosses_ == _needCheck || rounds_ == _needCheck)
+			return;
+		else
+		{
+			crosses_ = 0;
+			rounds_ = 0;
+		}
+	}
+
+}
+
+void Game::_checkSingleMark(int8_t x_,int8_t y_,uint8_t& crosses_, uint8_t& rounds_)
+{
+	if(_board.isInBoard(x_, y_))
+	{
+		if(_board.show(x_, y_) == Mark::cross)
+			crosses_++;
+		else if(_board.show(x_, y_) == Mark::round)
+			rounds_++;
+	}
+}
+
+std::string Game::_outputBorders()
+{
+	const static char bordCorner = '+';
+	const static bool needSpace = true;
+	const static char bordHorizontal = '-';
+	//border
+	std::stringstream str;
+	str << bordCorner;
+	for(uint8_t ix = 0; ix < _board.size(); ix++)
+	{
+		str << (needSpace ? " " : "") << bordHorizontal;
+	}
+	str << (needSpace ? " " : "") << bordCorner << "\n";
+	return str.str();
 }
 
 Game::Game(uint8_t sizeBoard_,uint8_t needCheck_) : _board(sizeBoard_)
@@ -111,20 +171,12 @@ void Game::turn(uint8_t x_, uint8_t y_)
 
 std::string Game::output()
 {
-	const static char bordCorner = '+';
 	const static char bordVertical = '|';
-	const static char bordHorizontal = '-';
 	const static bool needSpace = true;
 	std::stringstream str;
 	str << "turn: " << (_isCrossTurn ? "cross" : "round") << '\n';
 
-	//border
-	str << bordCorner;
-	for(uint8_t ix = 0; ix < _board.size(); ix++)
-	{
-		str << (needSpace ? " " : "") << bordHorizontal;
-	}
-	str << (needSpace ? " " : "") << bordCorner<<"\n";
+	str << _outputBorders();
 
 	//game field
 	for(uint8_t ix = 0; ix < _board.size(); ix++)
@@ -137,13 +189,8 @@ std::string Game::output()
 		str << (needSpace ? " " : "") << bordVertical << "\n";
 	}
 
-	//border
-	str << bordCorner;
-	for(uint8_t ix = 0; ix < _board.size(); ix++)
-	{
-		str << (needSpace ? " " : "") << bordHorizontal;
-	}
-	str << (needSpace ? " " : "") << bordCorner << "\n";
+	str << _outputBorders();
+
 	return str.str();
 }
 
@@ -166,6 +213,18 @@ Mark Game::checkWhoWin()
 		return Mark::cross;
 	else if(rounds == _needCheck)
 		return Mark::round;
-	
+
+	_checkDiagonals(crosses, rounds);
+	if(crosses == _needCheck)
+		return Mark::cross;
+	else if(rounds == _needCheck)
+		return Mark::round;
+
+	_checkDiagonals1(crosses, rounds);
+	if(crosses == _needCheck)
+		return Mark::cross;
+	else if(rounds == _needCheck)
+		return Mark::round;
+
 	return Mark::empty;
 }
