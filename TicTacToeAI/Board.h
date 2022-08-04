@@ -17,5 +17,6 @@ public:
 	void set(uint8_t x_, uint8_t y_, Mark mark_);
 	uint8_t size();
 	const Mark show(uint8_t x_, uint8_t y_);
+	bool isInBoard(int8_t x_, int8_t y_);
 	~Board();
 };

@@ -25,6 +25,11 @@ const Mark Board::show(uint8_t x_, uint8_t y_)
 	return _board[x_ + y_ * _size];
 }
 
+bool Board::isInBoard(int8_t x_, int8_t y_)
+{
+	return (0 <= x_) && (x_ < _size) && (0 <= y_) && (y_ < _size);
+}
+
 Board::~Board()
 {
 	delete[] _board;
