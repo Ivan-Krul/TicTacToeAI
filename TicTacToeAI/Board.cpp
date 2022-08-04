@@ -6,10 +6,11 @@ Board::Board(uint8_t size_)
 	_board = new Mark[_size * _size];
 }
 
-void Board::set(uint16_t pos_, Mark mark_)
+void Board::set(uint8_t x_, uint8_t y_, Mark mark_)
 {
-	assert(pos_ < _size);
-	_board[pos_] = mark_;
+	assert(x_ < _size);
+	assert(y_ < _size);
+	_board[x_ + y_ * _size] = mark_;
 }
 
 uint8_t Board::size()
@@ -17,10 +18,11 @@ uint8_t Board::size()
 	return _size;
 }
 
-const Mark Board::show(uint16_t pos_)
+const Mark Board::show(uint8_t x_, uint8_t y_)
 {
-	assert(pos_ < _size);
-	return _board[pos_];
+	assert(x_ < _size);
+	assert(y_ < _size);
+	return _board[x_ + y_ * _size];
 }
 
 Board::~Board()
