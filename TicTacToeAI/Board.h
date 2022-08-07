@@ -3,7 +3,7 @@
 #include <cassert>
 enum class Mark : char
 {
-	empty = ' ',
+	empty = '.',
 	cross = 'x',
 	round = 'o'
 };

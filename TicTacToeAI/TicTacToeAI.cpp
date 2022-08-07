@@ -8,7 +8,11 @@ int main()
 {
     Game game(3,3);
     game.turn(1, 1);
-    game.turn(2, 1);
+    game.turn(0, 0);
     std::cout<<game.output();
-    std::cout << "Hello World!\n";
+    game.turn(1, 0);
+    game.turn(2, 2);
+    game.turn(1, 2);
+    std::cout << game.output();
+    std::cout<<(char)game.checkWhoWin();
 }
