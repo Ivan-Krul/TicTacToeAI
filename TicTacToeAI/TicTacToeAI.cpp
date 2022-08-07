@@ -7,12 +7,12 @@
 int main()
 {
     Game game(3,3);
-    game.turn(1, 1);
-    game.turn(0, 0);
-    std::cout<<game.output();
-    game.turn(1, 0);
-    game.turn(2, 2);
-    game.turn(1, 2);
-    std::cout << game.output();
+    while(game.checkWhoWin() == Mark::empty)
+    {
+        int posX, posY;
+        std::cout << game.output();
+        std::cin >> posX >> posY;
+        game.turn(posX, posY);
+    }
     std::cout<<(char)game.checkWhoWin();
 }

@@ -1,121 +1,214 @@
 #include "Game.h"
 #include <sstream>
-void Game::_checkColons(uint8_t& crosses_, uint8_t& rounds_)
+
+Mark Game::_checkColons()
 {
-	//colons
-	for(uint8_t iy = 0; iy < _board.size(); iy++)
+	static uint8_t size = _board.size();
+	Mark prev;
+	uint8_t crosses = 0, rounds = 0;
+	for(uint8_t ix = 0; ix < size; ix++)
 	{
-		for(uint8_t ix = 0; ix < _board.size(); ix++)
+		prev = Mark::empty;
+		for(uint8_t iy = 0; iy < size; iy++)
 		{
-			_checkSingleMark(ix, iy, crosses_, rounds_);
-		}
-		if(crosses_ == _needCheck || rounds_ == _needCheck)
-			return;
-		else
-		{
-			crosses_ = 0;
-			rounds_ = 0;
+			switch(_board.show(ix, iy))
+			{
+				case Mark::cross:
+					if(prev != Mark::cross)
+						crosses = 0,rounds = 0;
+					crosses++;
+					break;
+				case Mark::round:
+					if(prev != Mark::round)
+						crosses = 0,rounds = 0;
+					rounds++;
+					break;
+				default:
+					crosses = 0,rounds = 0;
+					break;
+			}
+			prev = _board.show(ix, iy);
+
+			if(crosses == _needCheck) return Mark::cross;
+			else if(rounds == _needCheck) return Mark::round;
 		}
 	}
+	return Mark::empty;
 }
 
-void Game::_checkRows(uint8_t& crosses_, uint8_t& rounds_)
+Mark Game::_checkRows()
 {
-	//rows
-
-	for(uint8_t ix = 0; ix < _board.size(); ix++)
+	static uint8_t size = _board.size();
+	Mark prev;
+	uint8_t crosses = 0, rounds = 0;
+	for(uint8_t iy = 0; iy < size; iy++)
 	{
-		for(uint8_t iy = 0; iy < _board.size(); iy++)
+		prev = Mark::empty;
+		for(uint8_t ix = 0; ix < size; ix++)
 		{
-			_checkSingleMark(ix, iy, crosses_, rounds_);
-		}
+			switch(_board.show(ix, iy))
+			{
+				case Mark::cross:
+					if(prev != Mark::cross)
+						crosses = 0, rounds = 0;
+					crosses++;
+					break;
+				case Mark::round:
+					if(prev != Mark::round)
+						crosses = 0, rounds = 0;
+					rounds++;
+					break;
+				default:
+					crosses = 0, rounds = 0;
+					break;
+			}
+			prev = _board.show(ix, iy);
 
-		if(crosses_ == _needCheck || rounds_ == _needCheck)
-			return;
-		else
-		{
-			crosses_ = 0;
-			rounds_ = 0;
+			if(crosses == _needCheck) return Mark::cross;
+			else if(rounds == _needCheck) return Mark::round;
 		}
 	}
+	return Mark::empty;
 }
 
-void Game::_checkDiagonals(uint8_t& crosses_, uint8_t& rounds_)
+Mark Game::_checkDiagonalsUL()
 {
-	// diagonals, first stage
-	for(int8_t ip = 0; ip < _board.size(); ip++)
+	static uint8_t size = _board.size();
+	Mark prev;
+	uint8_t crosses = 0, rounds = 0;
+	for(uint8_t iy = 0; iy < size; iy++)
 	{
-		for(int8_t id = -_board.size()/2+1; id < _board.size(); id++)
+		prev = Mark::empty;
+		for(uint8_t id = 0; id <= iy; id++)
 		{
-			_checkSingleMark(ip + id, ip - id,crosses_,rounds_);
-		}
-		if(crosses_ == _needCheck || rounds_ == _needCheck)
-			return;
-		else
-		{
-			crosses_ = 0;
-			rounds_ = 0;
+			switch(_board.show(id, iy-id))
+			{
+				case Mark::cross:
+					if(prev != Mark::cross)
+						crosses = 0, rounds = 0;
+					crosses++;
+					break;
+				case Mark::round:
+					if(prev != Mark::round)
+						crosses = 0, rounds = 0;
+					rounds++;
+					break;
+				default:
+					crosses = 0, rounds = 0;
+					break;
+			}
+			prev = _board.show(id, iy-id);
+
+			if(crosses == _needCheck) return Mark::cross;
+			else if(rounds == _needCheck) return Mark::round;
 		}
 	}
-	for(int8_t ip = _board.size() - 1; ip >= 0; ip--)
-	{
-		for(int8_t id = 0; id < _board.size(); id++)
-		{
-			_checkSingleMark(ip + id, ip - id, crosses_, rounds_);
-		}
-		if(crosses_ == _needCheck || rounds_ == _needCheck)
-			return;
-		else
-		{
-			crosses_ = 0;
-			rounds_ = 0;
-		}
-	}
+	return Mark::empty;
 }
 
-void Game::_checkDiagonals1(uint8_t& crosses_, uint8_t& rounds_)
+Mark Game::_checkDiagonalsDL()
 {
-	// diagonals, second stage
-	for(int8_t ip = 0; ip < _board.size(); ip++)
+	static uint8_t size = _board.size();
+	Mark prev;
+	uint8_t crosses = 0, rounds = 0;
+	for(uint8_t ix = 0; ix < size; ix++)
 	{
-		for(int8_t id = -_board.size() / 2 + 1; id < _board.size(); id++)
+		prev = Mark::empty;
+		for(uint8_t id = 0; id <= ix; id++)
 		{
-			_checkSingleMark(ip + id + 1, ip - id, crosses_, rounds_);
-		}
-		if(crosses_ == _needCheck || rounds_ == _needCheck)
-			return;
-		else
-		{
-			crosses_ = 0;
-			rounds_ = 0;
-		}
-	}
-	for(int8_t ip = _board.size() - 1; ip >= 0; ip--)
-	{
-		for(int8_t id = 0; id < _board.size(); id++)
-		{
-			_checkSingleMark(ip + id + 1, ip - id, crosses_, rounds_);
-		}
-		if(crosses_ == _needCheck || rounds_ == _needCheck)
-			return;
-		else
-		{
-			crosses_ = 0;
-			rounds_ = 0;
-		}
-	}
+			switch(_board.show(ix - id, size - 1 - id))
+			{
+				case Mark::cross:
+					if(prev != Mark::cross)
+						crosses = 0, rounds = 0;
+					crosses++;
+					break;
+				case Mark::round:
+					if(prev != Mark::round)
+						crosses = 0, rounds = 0;
+					rounds++;
+					break;
+				default:
+					crosses = 0, rounds = 0;
+					break;
+			}
+			prev = _board.show(ix - id, size - 1 - id);
 
+			if(crosses == _needCheck) return Mark::cross;
+			else if(rounds == _needCheck) return Mark::round;
+		}
+	}
+	return Mark::empty;
 }
 
-void Game::_checkSingleMark(int8_t x_,int8_t y_,uint8_t& crosses_, uint8_t& rounds_)
+Mark Game::_checkDiagonalsUR()
 {
-	if(_board.isInBoard(x_, y_))
+	static uint8_t size = _board.size();
+	Mark prev;
+	uint8_t crosses = 0, rounds = 0;
+	for(uint8_t iy = 0; iy < size; iy++)
 	{
-		if(_board.show(x_, y_) == Mark::cross)
-			crosses_++;
-		else if(_board.show(x_, y_) == Mark::round)
-			rounds_++;
+		prev = Mark::empty;
+		for(uint8_t id = 0; id <= iy; id++)
+		{
+			switch(_board.show(size - 1 - id, iy - id))
+			{
+				case Mark::cross:
+					if(prev != Mark::cross)
+						crosses = 0, rounds = 0;
+					crosses++;
+					break;
+				case Mark::round:
+					if(prev != Mark::round)
+						crosses = 0, rounds = 0;
+					rounds++;
+					break;
+				default:
+					crosses = 0, rounds = 0;
+					break;
+			}
+			prev = _board.show(size - 1 - id, iy - id);
+
+			if(crosses == _needCheck) return Mark::cross;
+			else if(rounds == _needCheck) return Mark::round;
+		}
 	}
+	return Mark::empty;
+}
+
+Mark Game::_checkDiagonalsDR()
+{
+	static uint8_t size = _board.size();
+	Mark prev;
+	uint8_t crosses = 0, rounds = 0;
+	for(uint8_t ix = 0; ix < size; ix++)
+	{
+		prev = Mark::empty;
+		for(uint8_t id = 0; id <= ix; id++)
+		{
+			switch(_board.show(ix-id, size - 1 - id))
+			{
+				case Mark::cross:
+					if(prev != Mark::cross)
+						crosses = 0, rounds = 0;
+					crosses++;
+					break;
+				case Mark::round:
+					if(prev != Mark::round)
+						crosses = 0, rounds = 0;
+					rounds++;
+					break;
+				default:
+					crosses = 0, rounds = 0;
+					break;
+			}
+			prev = _board.show(ix - id, size - 1 - id);
+
+			if(crosses == _needCheck) return Mark::cross;
+			else if(rounds == _needCheck) return Mark::round;
+		}
+	}
+	return Mark::empty;
 }
 
 std::string Game::_outputBorders()
@@ -144,6 +237,7 @@ Game::Game(uint8_t sizeBoard_,uint8_t needCheck_) : _board(sizeBoard_)
 		}
 	}
 	_isCrossTurn = true;
+	_needCheck = needCheck_;
 }
 
 bool Game::isCrossTurn()
@@ -158,15 +252,18 @@ const Board Game::show()
 
 void Game::turn(uint8_t x_, uint8_t y_)
 {
-	if(_isCrossTurn)
+	if(_board.show(x_, y_) == Mark::empty)
 	{
-		_board.set(x_, y_, Mark::cross);
+		if(_isCrossTurn)
+		{
+			_board.set(x_, y_, Mark::cross);
+		}
+		else
+		{
+			_board.set(x_, y_, Mark::round);
+		}
+		_isCrossTurn = !_isCrossTurn;
 	}
-	else
-	{
-		_board.set(x_, y_, Mark::round);
-	}
-	_isCrossTurn = !_isCrossTurn;
 }
 
 std::string Game::output()
@@ -179,10 +276,10 @@ std::string Game::output()
 	str << _outputBorders();
 
 	//game field
-	for(uint8_t ix = 0; ix < _board.size(); ix++)
+	for(uint8_t iy = 0; iy < _board.size(); iy++)
 	{
 		str << bordVertical;
-		for(uint8_t iy = 0; iy < _board.size(); iy++)
+		for(uint8_t ix = 0; ix < _board.size(); ix++)
 		{
 			str << (needSpace ? " " : "") << (char)_board.show(ix, iy);
 		}
@@ -196,35 +293,32 @@ std::string Game::output()
 
 Mark Game::checkWhoWin()
 {
-	// we have board with marks ...
-	// ... and need check this, who is winning
-	// we will be checking all colons, rows and diagonals on winning
-	
+	static uint8_t size = _board.size();
+	Mark prev;
 	uint8_t crosses = 0;
 	uint8_t rounds = 0;
-	_checkColons(crosses, rounds);
-	if(crosses == _needCheck)
-		return Mark::cross;
-	else if(rounds == _needCheck)
-		return Mark::round;
 
-	_checkRows(crosses, rounds);
-	if(crosses == _needCheck)
-		return Mark::cross;
-	else if(rounds == _needCheck)
-		return Mark::round;
+	Mark resAlg = _checkColons();
+	if(resAlg != Mark::empty)
+		return resAlg;
 
-	_checkDiagonals(crosses, rounds);
-	if(crosses == _needCheck)
-		return Mark::cross;
-	else if(rounds == _needCheck)
-		return Mark::round;
+	resAlg = _checkRows();
+	if(resAlg != Mark::empty)
+		return resAlg;
 
-	_checkDiagonals1(crosses, rounds);
-	if(crosses == _needCheck)
-		return Mark::cross;
-	else if(rounds == _needCheck)
-		return Mark::round;
+	resAlg = _checkDiagonalsUL();
+	if(resAlg != Mark::empty)
+		return resAlg;
+	resAlg = _checkDiagonalsDL();
+	if(resAlg != Mark::empty)
+		return resAlg;
+
+	resAlg = _checkDiagonalsUR();
+	if(resAlg != Mark::empty)
+		return resAlg;
+	resAlg = _checkDiagonalsDR();
+	if(resAlg != Mark::empty)
+		return resAlg;
 
 	return Mark::empty;
 }
