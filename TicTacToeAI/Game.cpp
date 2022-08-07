@@ -291,6 +291,19 @@ std::string Game::output()
 	return str.str();
 }
 
+bool Game::isFilled()
+{
+	for(size_t ix = 0; ix < _board.size(); ix++)
+	{
+		for(size_t iy = 0; iy < _board.size(); iy++)
+		{
+			if(_board.show(ix, iy) == Mark::empty)
+				return false;
+		}
+	}
+	return true;
+}
+
 Mark Game::checkWhoWin()
 {
 	static uint8_t size = _board.size();

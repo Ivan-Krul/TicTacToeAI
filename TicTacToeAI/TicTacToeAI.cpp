@@ -7,12 +7,13 @@
 int main()
 {
     Game game(3,3);
-    while(game.checkWhoWin() == Mark::empty)
+    while(game.checkWhoWin() == Mark::empty && !game.isFilled())
     {
         int posX, posY;
         std::cout << game.output();
         std::cin >> posX >> posY;
         game.turn(posX, posY);
     }
+    std::cout << game.output();
     std::cout<<(char)game.checkWhoWin();
 }

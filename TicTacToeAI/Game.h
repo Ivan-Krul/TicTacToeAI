@@ -20,6 +20,7 @@ public:
 	const Board show();
 	void turn(uint8_t x_, uint8_t y);
 	std::string output();
+	bool isFilled();
 	Mark checkWhoWin();
 };
 
