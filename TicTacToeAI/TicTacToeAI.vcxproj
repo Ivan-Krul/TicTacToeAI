@@ -127,12 +127,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Ai.cpp" />
     <ClCompile Include="Board.cpp" />
+    <ClCompile Include="BoardParser.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="TicTacToeAI.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Ai.h" />
     <ClInclude Include="Board.h" />
+    <ClInclude Include="BoardParser.h" />
     <ClInclude Include="Game.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

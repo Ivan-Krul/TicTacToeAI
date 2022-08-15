@@ -8,10 +8,10 @@ Board::Board(uint8_t size_)
 
 void Board::set(int8_t x_, int8_t y_, Mark mark_)
 {
-	assert(x_ < _size);
-	assert(y_ < _size);
-	assert(x_ >= 0);
-	assert(y_ >= 0);
+	assert((x_ < _size));
+	assert((y_ < _size));
+	assert((x_ >= 0));
+	assert((y_ >= 0));
 	_board[x_ + y_ * _size] = mark_;
 }
 
@@ -22,10 +22,10 @@ uint8_t Board::size()
 
 const Mark Board::show(int8_t x_, int8_t y_)
 {
-	assert(x_ < _size);
-	assert(y_ < _size);
-	assert(x_ >= 0);
-	assert(y_ >= 0);
+	assert((x_ < _size));
+	assert((y_ < _size));
+	assert((x_ >= 0));
+	assert((y_ >= 0));
 	return _board[x_ + y_ * _size];
 }
 

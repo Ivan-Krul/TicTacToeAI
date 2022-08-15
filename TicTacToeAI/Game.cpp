@@ -1,215 +1,6 @@
 #include "Game.h"
+#include "BoardParser.h"
 #include <sstream>
-
-Mark Game::_checkColons()
-{
-	static uint8_t size = _board.size();
-	Mark prev;
-	uint8_t crosses = 0, rounds = 0;
-	for(uint8_t ix = 0; ix < size; ix++)
-	{
-		prev = Mark::empty;
-		for(uint8_t iy = 0; iy < size; iy++)
-		{
-			switch(_board.show(ix, iy))
-			{
-				case Mark::cross:
-					if(prev != Mark::cross)
-						crosses = 0,rounds = 0;
-					crosses++;
-					break;
-				case Mark::round:
-					if(prev != Mark::round)
-						crosses = 0,rounds = 0;
-					rounds++;
-					break;
-				default:
-					crosses = 0,rounds = 0;
-					break;
-			}
-			prev = _board.show(ix, iy);
-
-			if(crosses == _needCheck) return Mark::cross;
-			else if(rounds == _needCheck) return Mark::round;
-		}
-	}
-	return Mark::empty;
-}
-
-Mark Game::_checkRows()
-{
-	static uint8_t size = _board.size();
-	Mark prev;
-	uint8_t crosses = 0, rounds = 0;
-	for(uint8_t iy = 0; iy < size; iy++)
-	{
-		prev = Mark::empty;
-		for(uint8_t ix = 0; ix < size; ix++)
-		{
-			switch(_board.show(ix, iy))
-			{
-				case Mark::cross:
-					if(prev != Mark::cross)
-						crosses = 0, rounds = 0;
-					crosses++;
-					break;
-				case Mark::round:
-					if(prev != Mark::round)
-						crosses = 0, rounds = 0;
-					rounds++;
-					break;
-				default:
-					crosses = 0, rounds = 0;
-					break;
-			}
-			prev = _board.show(ix, iy);
-
-			if(crosses == _needCheck) return Mark::cross;
-			else if(rounds == _needCheck) return Mark::round;
-		}
-	}
-	return Mark::empty;
-}
-
-Mark Game::_checkDiagonalsUL()
-{
-	static uint8_t size = _board.size();
-	Mark prev;
-	uint8_t crosses = 0, rounds = 0;
-	for(uint8_t iy = 0; iy < size; iy++)
-	{
-		prev = Mark::empty;
-		for(uint8_t id = 0; id <= iy; id++)
-		{
-			switch(_board.show(id, iy-id))
-			{
-				case Mark::cross:
-					if(prev != Mark::cross)
-						crosses = 0, rounds = 0;
-					crosses++;
-					break;
-				case Mark::round:
-					if(prev != Mark::round)
-						crosses = 0, rounds = 0;
-					rounds++;
-					break;
-				default:
-					crosses = 0, rounds = 0;
-					break;
-			}
-			prev = _board.show(id, iy-id);
-
-			if(crosses == _needCheck) return Mark::cross;
-			else if(rounds == _needCheck) return Mark::round;
-		}
-	}
-	return Mark::empty;
-}
-
-Mark Game::_checkDiagonalsDL()
-{
-	static uint8_t size = _board.size();
-	Mark prev;
-	uint8_t crosses = 0, rounds = 0;
-	for(uint8_t ix = 0; ix < size; ix++)
-	{
-		prev = Mark::empty;
-		for(uint8_t id = 0; id <= ix; id++)
-		{
-			switch(_board.show(ix - id, size - 1 - id))
-			{
-				case Mark::cross:
-					if(prev != Mark::cross)
-						crosses = 0, rounds = 0;
-					crosses++;
-					break;
-				case Mark::round:
-					if(prev != Mark::round)
-						crosses = 0, rounds = 0;
-					rounds++;
-					break;
-				default:
-					crosses = 0, rounds = 0;
-					break;
-			}
-			prev = _board.show(ix - id, size - 1 - id);
-
-			if(crosses == _needCheck) return Mark::cross;
-			else if(rounds == _needCheck) return Mark::round;
-		}
-	}
-	return Mark::empty;
-}
-
-Mark Game::_checkDiagonalsUR()
-{
-	static uint8_t size = _board.size();
-	Mark prev;
-	uint8_t crosses = 0, rounds = 0;
-	for(uint8_t iy = 0; iy < size; iy++)
-	{
-		prev = Mark::empty;
-		for(uint8_t id = 0; id <= iy; id++)
-		{
-			switch(_board.show(size - 1 - id, iy - id))
-			{
-				case Mark::cross:
-					if(prev != Mark::cross)
-						crosses = 0, rounds = 0;
-					crosses++;
-					break;
-				case Mark::round:
-					if(prev != Mark::round)
-						crosses = 0, rounds = 0;
-					rounds++;
-					break;
-				default:
-					crosses = 0, rounds = 0;
-					break;
-			}
-			prev = _board.show(size - 1 - id, iy - id);
-
-			if(crosses == _needCheck) return Mark::cross;
-			else if(rounds == _needCheck) return Mark::round;
-		}
-	}
-	return Mark::empty;
-}
-
-Mark Game::_checkDiagonalsDR()
-{
-	static uint8_t size = _board.size();
-	Mark prev;
-	uint8_t crosses = 0, rounds = 0;
-	for(uint8_t ix = 0; ix < size; ix++)
-	{
-		prev = Mark::empty;
-		for(uint8_t id = 0; id <= ix; id++)
-		{
-			switch(_board.show(ix-id, size - 1 - id))
-			{
-				case Mark::cross:
-					if(prev != Mark::cross)
-						crosses = 0, rounds = 0;
-					crosses++;
-					break;
-				case Mark::round:
-					if(prev != Mark::round)
-						crosses = 0, rounds = 0;
-					rounds++;
-					break;
-				default:
-					crosses = 0, rounds = 0;
-					break;
-			}
-			prev = _board.show(ix - id, size - 1 - id);
-
-			if(crosses == _needCheck) return Mark::cross;
-			else if(rounds == _needCheck) return Mark::round;
-		}
-	}
-	return Mark::empty;
-}
 
 std::string Game::_outputBorders()
 {
@@ -311,25 +102,27 @@ Mark Game::checkWhoWin()
 	uint8_t crosses = 0;
 	uint8_t rounds = 0;
 
-	Mark resAlg = _checkColons();
+	BoardParser parser(_board);
+
+	Mark resAlg = parser.checkColons(_needCheck);
 	if(resAlg != Mark::empty)
 		return resAlg;
 
-	resAlg = _checkRows();
+	resAlg = parser.checkRows(_needCheck);
 	if(resAlg != Mark::empty)
 		return resAlg;
 
-	resAlg = _checkDiagonalsUL();
+	resAlg = parser.checkDiagonalsUL(_needCheck);
 	if(resAlg != Mark::empty)
 		return resAlg;
-	resAlg = _checkDiagonalsDL();
+	resAlg = parser.checkDiagonalsDL(_needCheck);
 	if(resAlg != Mark::empty)
 		return resAlg;
 
-	resAlg = _checkDiagonalsUR();
+	resAlg = parser.checkDiagonalsUR(_needCheck);
 	if(resAlg != Mark::empty)
 		return resAlg;
-	resAlg = _checkDiagonalsDR();
+	resAlg = parser.checkDiagonalsDR(_needCheck);
 	if(resAlg != Mark::empty)
 		return resAlg;
 
