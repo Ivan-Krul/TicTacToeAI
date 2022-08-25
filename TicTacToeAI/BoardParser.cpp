@@ -131,6 +131,11 @@ Mark BoardParser::checkDiagonalsUR(uint8_t needCheck_)
 	return Mark::empty;
 }
 
+int(&BoardParser::abortedPos())[2]
+{
+	return _abortedPos;
+}
+
 Mark BoardParser::checkDiagonalsDR(uint8_t needCheck_)
 {
 	Mark prev;

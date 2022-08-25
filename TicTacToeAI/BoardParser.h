@@ -18,5 +18,6 @@ public:
 	Mark checkDiagonalsDL(uint8_t needCheck_);
 	Mark checkDiagonalsUR(uint8_t needCheck_);
 	Mark checkDiagonalsDR(uint8_t needCheck_);
+	int(&abortedPos())[2];
 };
 

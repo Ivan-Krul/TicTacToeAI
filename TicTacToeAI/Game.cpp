@@ -36,7 +36,7 @@ bool Game::isCrossTurn()
 	return _isCrossTurn;
 }
 
-const Board Game::show()
+Board Game::show()
 {
 	return _board;
 }
@@ -95,36 +95,62 @@ bool Game::isFilled()
 	return true;
 }
 
+bool Game::isEmpty()
+{
+	for(size_t ix = 0; ix < _board.size(); ix++)
+	{
+		for(size_t iy = 0; iy < _board.size(); iy++)
+		{
+			if(_board.show(ix, iy) != Mark::empty)
+				return false;
+		}
+	}
+	return true;
+}
+
+int Game::count(Mark mark_)
+{
+	int cnt = 0;
+	for(size_t ix = 0; ix < _board.size(); ix++)
+	{
+		for(size_t iy = 0; iy < _board.size(); iy++)
+		{
+			if(_board.show(ix, iy) == mark_)
+				cnt++;
+		}
+	}
+	return cnt;
+}
+
+const int Game::needToWin()
+{
+	return _needCheck;
+}
+
 Mark Game::checkWhoWin()
 {
 	static uint8_t size = _board.size();
 	Mark prev;
 	uint8_t crosses = 0;
 	uint8_t rounds = 0;
-
 	BoardParser parser(_board);
-
 	Mark resAlg = parser.checkColons(_needCheck);
 	if(resAlg != Mark::empty)
 		return resAlg;
-
 	resAlg = parser.checkRows(_needCheck);
 	if(resAlg != Mark::empty)
 		return resAlg;
-
 	resAlg = parser.checkDiagonalsUL(_needCheck);
 	if(resAlg != Mark::empty)
 		return resAlg;
 	resAlg = parser.checkDiagonalsDL(_needCheck);
 	if(resAlg != Mark::empty)
 		return resAlg;
-
 	resAlg = parser.checkDiagonalsUR(_needCheck);
 	if(resAlg != Mark::empty)
 		return resAlg;
 	resAlg = parser.checkDiagonalsDR(_needCheck);
 	if(resAlg != Mark::empty)
 		return resAlg;
-
 	return Mark::empty;
 }
